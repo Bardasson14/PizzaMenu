@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <pizza.h>
+#include "pizza.h"
 
 const int t = 2;
 
