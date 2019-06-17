@@ -1,4 +1,7 @@
 #include "arvbm.h"
+#include <stdio.h>
+#include <stdlib.h>
+
 
 TABM *cria(int t){
   TABM* novo = (TABM*)malloc(sizeof(TABM));
@@ -52,12 +55,16 @@ void imprime(TABM *a, int andar){
 }
 
 TABM *divisao(TABM *x, int i, TABM* y, int t){
+  
   TABM *z = cria(t);
+
   z->folha = y->folha;
   int j;
   if(!y->folha){
+    
     z->nchaves = t-1;
-    for(j=0;j<t-1;j++) z->chave[j]->cod = y->chave[j+t]->cod;
+    for(j=0;j<t-1;j++) 
+      z->chave[j]= y->chave[j+t];
     for(j=0;j<t;j++){
       z->filho[j] = y->filho[j+t];
       y->filho[j+t] = NULL;
@@ -65,14 +72,19 @@ TABM *divisao(TABM *x, int i, TABM* y, int t){
   }
   else {
     z->nchaves = t; //z possuir� uma chave a mais que y se for folha
-    for(j=0;j < t;j++) z->chave[j]->cod = y->chave[j+t-1]->cod;//Caso em que y � folha, temos q passar a info para o n� da direita
+    
+    for(j=0;j < t;j++) 
+      z->chave[j] = y->chave[j+t-1];//Caso em que y � folha, temos q passar a info para o n� da direita
     y->prox = z;
+    
   }
   y->nchaves = t-1;
-  for(j=x->nchaves; j>=i; j--) x->filho[j+1]=x->filho[j];
+  for(j=x->nchaves; j>=i; j--) 
+    x->filho[j+1]=x->filho[j];
   x->filho[i] = z;
-  for(j=x->nchaves; j>=i; j--) x->chave[j]->cod = x->chave[j-1]->cod;
-  x->chave[i-1]->cod = y->chave[t-1]->cod;
+  for(j=x->nchaves; j>=i; j--) 
+    x->chave[j]= x->chave[j-1];
+  x->chave[i-1] = y->chave[t-1];
   x->nchaves++;
   return x;
 }
@@ -82,7 +94,7 @@ TABM *insere_nao_completo(TABM *x, TPizza *pizza, int t){
   int i = x->nchaves-1;
   if(x->folha){
     while((i>=0) && (pizza->cod < x->chave[i]->cod)){
-      x->chave[i+1]->cod = x->chave[i]->cod;
+      x->chave[i+1] = x->chave[i];
       i--;
     }
     x->chave[i+1] = pizza;
@@ -107,14 +119,18 @@ TABM *insere(TABM *T, TPizza *pizza, int t){
     T->nchaves=1;
     return T;
   }
+
   if(T->nchaves == (2*t)-1){
+    printf("pagina cheia\n");
     TABM *S = cria(t);
     S->nchaves=0;
     S->folha = 0;
     S->filho[0] = T;
+
     S = divisao(S,1,T,t);
     S = insere_nao_completo(S, pizza, t);
     return S;
+  
   }
   T = insere_nao_completo(T, pizza, t);
   return T;
@@ -125,10 +141,10 @@ int main(void){
   TABM * arvore = inicializa();
   int num = 0;
   FILE *f = fopen("dados_iniciais.dat", "rb");
+  int t = 2;
   while(num != -1){
-    int t = 2;
     printf("Digite um numero para adicionar. 0 para imprimir e -1 para sair\n");
-    scanf("%d", &num);
+    scanf("%i", &num);
     if(num == -1){
       printf("\n");
       imprime(arvore,0);
@@ -146,12 +162,13 @@ int main(void){
       printf("\n");
       imprime(arvore,0);
     }
-    else{
-
-      TPizza *p = le_pizza(f);
-      
-      arvore = insere(arvore, p, t);
-
+    else if (num==1){
+        TPizza *p = le_pizza(f);
+        printf("NOME DA PIZZA: %s\n", p->nome);
+        printf("PREÇO DA PIZZA: %f\n", p->preco);
+        printf("DESCRIÇÃO DA PIZZA: %s\n", p->descricao);
+        printf("CÓDIGO DA PIZZA: %d\n", p->cod);
+        arvore = insere(arvore, p, t);
     }
     printf("\n\n");
   }
