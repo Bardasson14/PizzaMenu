@@ -6,7 +6,7 @@ const int t = 2;
 
 typedef struct arvbm{
   int nchaves, folha;
-  TPizza *chave;
+  TPizza **chave;
   struct arvbm **filho, *prox;
 }TABM;
 
@@ -16,6 +16,6 @@ void libera(TABM *a);
 TABM *busca(TABM *a, int mat);
 void imprime(TABM *a, int andar);
 TABM *divisao(TABM *x, int i, TABM* y, int t);
-TABM *insere_nao_completo(TABM *x, int mat, int t);
-TABM *insere(TABM *T, int mat, int t);
+TABM *insere_nao_completo(TABM *x, TPizza *p, int t);
+TABM *insere(TABM *T, TPizza *p, int t);
 

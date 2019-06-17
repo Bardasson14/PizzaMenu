@@ -1,5 +1,3 @@
-#include <string.h>
-#include <stdlib.h>
 #include "pizza.h"
 
 void imprime_pizza(TPizza *p)
