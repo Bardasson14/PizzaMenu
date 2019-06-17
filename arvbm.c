@@ -1,12 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-
-const int t = 2;
-
-typedef struct arvbm{
-  int nchaves, folha, *chave;
-  struct arvbm **filho, *prox;
-}TABM;
+#include "arvbm.h"
 
 
 TABM *cria(int t){
@@ -129,7 +121,7 @@ TABM *insere(TABM *T, int mat, int t){
 }
 
 
-int main(void){
+/*int main(void){
   TABM * arvore = inicializa();
   int num = 0, from, to;
   while(num != -1){
@@ -147,7 +139,7 @@ int main(void){
       arvore = retira(arvore, from, t);
       Imprime(arvore,0);
     }
-    */
+    
     else if(!num){
       printf("\n");
       imprime(arvore,0);
@@ -155,5 +147,7 @@ int main(void){
     else arvore = insere(arvore, num, t);
     printf("\n\n");
   }
+
+ */
 }
 
