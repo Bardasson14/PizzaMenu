@@ -5,17 +5,29 @@
 const int t = 2;
 
 typedef struct arvbm{
-  int nchaves, folha;
-  TPizza **chave;
-  struct arvbm **filho, *prox;
+  int nchaves, folha, *chave;
+  long *ind, *filho, prox;
 }TABM;
 
-TABM *cria(int t);
-TABM *inicializa(void);
-void libera(TABM *a);
-TABM *busca(TABM *a, int mat);
-void imprime(TABM *a, int andar);
-TABM *divisao(TABM *x, int i, TABM* y, int t);
-TABM *insere_nao_completo(TABM *x, TPizza *p, int t);
-TABM *insere(TABM *T, TPizza *p, int t);
+TABM *cria(int t);    //Aloca espaço no para a estrutura no arquivo
+
+void libera(TABM *a); //libera árvore na MP
+
+void imprime(TABM *a, int andar); //Imprime árvore do arquivo
+
+void divisao(TABM *x, int i, TABM* y, int t);  //Divide no arquivo
+
+void insere_nao_completo(TABM *x, int mat, int t); //Insere em nó não completo
+
+void insere(TABM *T, int mat, int t);  //Insere
+
+void remove(); //Remove(a melhor opção é mudar os indices para nunca parar aqui)
+
+void remove_categoria(); //Remove todas as pizzas de uma mesma categoria
+
+TPizza *busca_pizza(FILE *indices, FILE* catalogo, int cod);  //Busca a pizza pela chave primária
+
+TPizza **busca_categoria(FILE *indices, FILE* catalogo, char * categoria); //Busca todas as pizzas de uma categoria
+
+void altera_Pizza(FILE *indices, FILE* catalogo, int cod);  //Pede inputs para alterar as informações de uma pizza de chave primária cod;
 
