@@ -5,11 +5,11 @@
 const int t = 2;
 
 typedef struct arvbm{
-  int nchaves, folha;
+  int nchaves, folha, *chave;
   long *ind, *filho, prox;
 }TABM;
 
-void cria(int t);    //Aloca espaço no para a estrutura no arquivo
+TABM *cria(int t);    //Aloca espaço no para a estrutura no arquivo
 
 void libera(TABM *a); //libera árvore na MP
 
