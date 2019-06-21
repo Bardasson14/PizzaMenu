@@ -2,7 +2,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-TABM* cria(int t){
+void salva_pagina(FILE* indices, TABM *pagina){
+
+  fwrite(pagina, sizeof(TABM), 1, indices);
+
+}
+
+TABM *le_pagina(FILE *indices, int t){
+
+  TABM *pagina = cria(t);
+  fread(pagina, sizeof(TABM), 1, indices);
+
+}
+
+
+
+TABM *cria(int t){
   TABM* novo = (TABM*)malloc(sizeof(TABM));
   novo->nchaves = 0;
   novo->chave = (int*) malloc(sizeof(int)*((t*2)-1));
@@ -77,14 +92,68 @@ TPizza *busca_pizza(FILE *indices, FILE* catalogo, int cod){
 void imprime(TABM *a, int andar){
 }
 
-TABM *divisao(TABM *x, int i, TABM* y, int t){
+void divisao(FILE *indices, long pai, int i, long filho, int t){
+
+  TABM *z = cria(t);
+
+  fseek(indices, pai, SEEK_SET);
+  TABM *x = le_pagina(indices, t);
+
+  fseek(indices, filho, SEEK_SET);
+  TABM *y = le_pagina(indices, t);
+
+  z->folha = y->folha;
+  if(!y->folha){
+
+    int j;
+    z->nchaves = t-1;
+    for(j = 0; j < t; j++)  z->chave[j] = y->chave[j+t];
+    for(j = 0; j < t; j++){
+
+      z->filho[j] = y->filho[j+t];
+      y->filho[j+t] = NULL;
+
+    }
+  }
+  else{
+
+    int j;
+    z->nchaves = t; //z possuirá uma chave a mais que y se for folha
+    for(j = 0; j < t; j++)  z->chave[j] = y->chave[j+t-1];  //Caso em que y é folha, temos que passar a info do nó para a direita
+    y->prox = z;
+  
+  }
+
+  y->nchaves = t-1;
+  int k;
+  for(k = x->nchaves; k >= i; k--)  x->filho[k+1] = x->filho[k];  
+  x->filho[i] = z;
+  for(k = x->nchaves; k >= i; k--)  x->chave[k] = x->chave[k+1];
+  x->chave[i-1] = y->chave[t-1];
+  x->nchaves++;
+  
+  //Nesse ponto ja fiz a divisão, agora basta sobreescrever no arquivo;
+
+  fseek(indices, pai, SEEK_SET);  //Sobreescreve o pai
+  salva_pagina(indices, x);
+
+  fseek(indices, filho, SEEK_SET);  //Sobreescreve o filho
+  salva_pagina(indices, y);
+
+  fseek(indices, 0L, SEEK_END);  //Escreve a nova página no final;
+  salva_pagina(indices, z);
+
+  libera(z);
+  libera(y);
+  libera(z);
+
 }
 
 
 TABM *insere_nao_completo(TABM *x, int mat, int t){
 }
 
-TABM *insere(TABM *T, int mat, int t){
+TABM insere(long T, int mat, int t){
 }
 
 

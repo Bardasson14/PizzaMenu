@@ -2,24 +2,28 @@
 #include <stdlib.h>
 #include "pizza.h"
 
-const int t = 2;
 
 typedef struct arvbm{
   int nchaves, folha, *chave;
   long *ind, *filho, prox;
 }TABM;
 
-TABM *cria(int t);    //Aloca espaço no para a estrutura no arquivo
+
+TABM *le_pagina(FILE *indices, int t); //Lê uma página na posição atual do cursor
+
+void salva_pagina(FILE* indices, TABM *pagina);  //Escreve página na posição atual do cursor
+
+TABM *cria(int t);    //Cria árvore em MP
 
 void libera(TABM *a); //libera árvore na MP
 
 void imprime(TABM *a, int andar); //Imprime árvore do arquivo
 
-void divisao(TABM *x, int i, TABM* y, int t);  //Divide no arquivo
+void divisao(FILE *indices, long pai, int i, long filho, int t);  //Divide no arquivo
 
 void insere_nao_completo(TABM *x, int mat, int t); //Insere em nó não completo
 
-void insere(TABM *T, int mat, int t);  //Insere
+void insere(TABM *T, int cod, int t);  //Insere
 
 void remove(); //Remove(a melhor opção é mudar os indices para nunca parar aqui)
 
