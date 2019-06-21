@@ -7,17 +7,17 @@ TABM* cria(int t){
   novo->nchaves = 0;
   novo->chave = (int*) malloc(sizeof(int)*((t*2)-1));
   novo->folha = 1;
-  novo->ind =  (long*)malloc(sizeof(long)*(2*t-1));
+  novo->ind = (long*) malloc(sizeof(long)*((t*2)-1));
   novo->filho = (long*)malloc(sizeof(long)*t*2);
   novo->prox = NULL;
   int i;
-  for(i=0; i<(t*2); i++) 
-    novo->filho[i] = NULL;
-  for (i=0; i<(t*2-1); i++){
+
+  for(i=0; i<(t*2); i++) novo->filho[i] = NULL;
+
+  for(i=0; i<(2*t - 1); i++){
     novo->chave[i] = NULL;
     novo->ind[i] = NULL;
   }
-
 
   return novo;
 }
@@ -30,16 +30,48 @@ TABM *inicializa(void){
 void libera(TABM *a){
   if(a){
     if(!a->folha){
+
       int i;
       for(i = 0; i <= a->nchaves; i++) libera(a->filho[i]);
+
+      for(i = 0; i < a->nchaves; i++){
+
+        libera(a->chave[i]);
+        libera(a->ind[i]);
+
+      }
     }
-    int i;
-    for(i = 0; i < a->nchaves;i++) free(a->chave[i]);
     free(a);
   }
 }
 
-TABM *busca(TABM *a, int mat){
+TPizza *busca_pizza(FILE *indices, FILE* catalogo, int cod){
+
+  if(!indices || !catalogo) return NULL;
+
+  TABM *pagina;
+
+  //Pegando a pagina no arquivo
+  fread(&pagina, sizeof(TABM), 1, indices); 
+
+  int i = 0;
+  while((i < pagina->nchaves) && (cod > pagina->chave[i])) i++;
+
+  if((i < pagina->nchaves) && (pagina->folha) && (cod == pagina->chave[i])){
+
+    TPizza *pizza = NULL;
+    fseek(catalogo, pagina->ind[i], SEEK_SET);
+    pizza = le_pizza(catalogo);
+    return pizza;
+
+  }
+
+  if(pagina->folha) return NULL;
+
+  if(pagina->chave[i] == cod) i++;
+  fseek(indices, pagina->filho[i], SEEK_SET);
+  return busca_pizza(indices, catalogo, cod);
+
 }
 
 void imprime(TABM *a, int andar){
