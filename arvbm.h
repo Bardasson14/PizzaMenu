@@ -15,15 +15,15 @@ void salva_pagina(FILE *indices, TABM *pagina);  //Escreve página na posição 
 
 TABM *cria(int t);    //Cria árvore em MP
 
-void libera(TABM *a); //libera árvore na MP
+//void libera(TABM *a); //libera árvore na MP
 
 void imprime(TABM *a, int andar); //Imprime árvore do arquivo
 
 void divisao(FILE *indices, long pai, int i, long filho, int t);  //Divide no arquivo
 
-void *insere_nao_completo(FILE *indices, long *x, int mat, int t); //Insere em nó não completo
+void insere_nao_completo(FILE *indices, long x, int mat, int t); //Insere em nó não completo
 
-void *insere(long *T, int cod, int t, FILE *catalogo, FILE *indices);
+void insere(long T, int cod, int t, FILE *catalogo, FILE *indices);
 
 void remove_pizza(); //Remove(a melhor opção é mudar os indices para nunca parar aqui)
 
