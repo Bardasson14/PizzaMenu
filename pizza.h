@@ -1,5 +1,6 @@
 #include <stdio.h>
-#include "arvbm.h"
+#include <string.h>
+#include <stdlib.h>
 
 typedef struct pizza {
 	int cod;
