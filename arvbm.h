@@ -17,7 +17,7 @@ TABM *cria(int t);    //Cria árvore em MP
 
 //void libera(TABM *a); //libera árvore na MP
 
-void imprime(TABM *a, int andar); //Imprime árvore do arquivo
+void imprime(TABM *a, int andar, FILE *indices); //Imprime árvore do arquivo
 
 void divisao(FILE *indices, long pai, int i, long filho, int t);  //Divide no arquivo
 
