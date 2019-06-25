@@ -1,27 +1,28 @@
 #include "pizza.h"
 
+#define t 2
 
 typedef struct arvbm{
-  int nchaves, folha, *chave;
-  long *ind, *filho, prox;
+  int nchaves, folha, chave[(2*t)-1];
+  long ind[(2*t)-1], filho[2*t], prox;
 }TABM;
 
 
-TABM *le_pagina(FILE *indices, long indice, int t); //Lê uma página na posição atual do cursor
+TABM *le_pagina(FILE *indices, long indice); //Lê uma página na posição atual do cursor
 
 void salva_pagina(FILE *indices, long indice, TABM *pagina);  //Escreve página na posição atual do cursor
 
-TABM *cria(int t);    //Cria árvore em MP
+TABM *cria();    //Cria árvore em MP
 
 //void libera(TABM *a); //libera árvore na MP
 
-void imprime(TABM *a, int andar, FILE *indices, int t); //Imprime árvore do arquivo
+void imprime(TABM *a, int andar, FILE *indices); //Imprime árvore do arquivo
 
-void divisao(FILE *indices, long pai, int i, long filho, int t);  //Divide no arquivo
+void divisao(FILE *indices, long pai, int i, long filho);  //Divide no arquivo
 
-void insere_nao_completo(FILE *indices, long x, int mat, int t); //Insere em nó não completo
+void insere_nao_completo(FILE *indices, long x, int mat); //Insere em nó não completo
 
-void insere(long T, int cod, int t, FILE *catalogo, FILE *indices);
+void insere(long T, int cod, FILE *catalogo, FILE *indices);
 
 void remove_pizza(); //Remove(a melhor opção é mudar os indices para nunca parar aqui)
 
