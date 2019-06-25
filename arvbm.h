@@ -1,5 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include "pizza.h"
 
 
@@ -9,15 +7,15 @@ typedef struct arvbm{
 }TABM;
 
 
-TABM *le_pagina(FILE *indices, int t); //Lê uma página na posição atual do cursor
+TABM *le_pagina(FILE *indices, long indice, int t); //Lê uma página na posição atual do cursor
 
-void salva_pagina(FILE *indices, TABM *pagina);  //Escreve página na posição atual do cursor
+void salva_pagina(FILE *indices, long indice, TABM *pagina);  //Escreve página na posição atual do cursor
 
 TABM *cria(int t);    //Cria árvore em MP
 
 //void libera(TABM *a); //libera árvore na MP
 
-void imprime(TABM *a, int andar, FILE *indices); //Imprime árvore do arquivo
+void imprime(TABM *a, int andar, FILE *indices, int t); //Imprime árvore do arquivo
 
 void divisao(FILE *indices, long pai, int i, long filho, int t);  //Divide no arquivo
 

@@ -1,4 +1,5 @@
 #include "pizza.h"
+
 void imprime_pizza(TPizza *p)
 {
 	printf("%d, %s (%s), R$ %.2f\n", p->cod, p->nome, p->descricao, p->preco);
