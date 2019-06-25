@@ -20,9 +20,9 @@ void imprime(TABM *a, int andar, FILE *indices); //Imprime árvore do arquivo
 
 void divisao(FILE *indices, long pai, int i, long filho);  //Divide no arquivo
 
-void insere_nao_completo(FILE *indices, long x, int mat); //Insere em nó não completo
+void insere_nao_completo(FILE *indices, long x, int mat, long indPizza); //Insere em nó não completo
 
-void insere(long T, int cod, FILE *catalogo, FILE *indices);
+long insere(long indRaiz, int cod, FILE *catalogo, FILE *indices, long indPizza);
 
 void remove_pizza(); //Remove(a melhor opção é mudar os indices para nunca parar aqui)
 

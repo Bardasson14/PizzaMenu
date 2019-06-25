@@ -4,20 +4,8 @@
 void salva_pagina(FILE* indices, long indice, TABM *pagina){
 
   fseek(indices, indice, SEEK_SET);
+  printf("SALVA:\n nchaves: %d\n", pagina->nchaves);
   fwrite(pagina, sizeof(TABM), 1, indices);
-
-  // fwrite(&pagina->nchaves, sizeof(int), 1, indices);
-  // printf("foi1");
-  // fwrite(&pagina->folha, sizeof(int), 1, indices);
-  // printf("foi2");
-  // fwrite(pagina->chave, sizeof(int*), sizeof(pagina->chave), indices);
-  // printf("foi3");
-  // fwrite(pagina->ind, sizeof(long*), sizeof(pagina->ind), indices);
-  // printf("foi4");
-  // fwrite(pagina->filho, sizeof(long*), sizeof(pagina->filho), indices);
-  // printf("foi5");
-  // fwrite(&pagina->prox, sizeof(long), 1, indices);
-  // printf("foi6");
  
   fseek(indices, 0L, SEEK_SET);  //Retornando o cursor para o início do arquivo
 
@@ -27,14 +15,15 @@ TABM *le_pagina(FILE *indices, long indice){
 
   if(feof(indices)) return NULL;
 
-  TABM *pagina = cria();
+  TABM *pagina = (TABM*) malloc(sizeof(TABM));
   fseek(indices, indice, SEEK_SET);
 
 
   size_t ok = fread(pagina, sizeof(TABM), 1, indices);
   fseek(indices, 0L, SEEK_SET); //Retornando o cursor para o início do arquivo
-
+  
   if(ok != 1){
+    printf("NÃO LEU CORRETAMENTE\n");
     return NULL;
   }
 
@@ -117,7 +106,7 @@ TPizza *busca_pizza(FILE *indices, FILE* catalogo, int cod){
 void imprime(TABM *a, int andar, FILE *indices){
   if(a){
     int i,j;
-    for(i=0; i<=a->nchaves-1; i++){
+    for(i=0; i <= a->nchaves-1; i++){
       
       imprime(le_pagina(indices, a->filho[i]), andar+1, indices);
       for(j=0; j<=andar; j++) printf("   ");
@@ -182,75 +171,85 @@ void divisao(FILE *indices, long pai, int i, long filho){
 }
 
 
-void insere_nao_completo(FILE *indices, long T, int mat){
+void insere_nao_completo(FILE *indices, long indAtual, int mat, long indPizza){
 
   printf("INSERE NÃO COMPLETO:\n");
 
-  printf("%ld", T);
+  TABM *pag = le_pagina(indices, indAtual); //Lê a página no indice atual
+  int i = pag->nchaves - 1;
 
-  TABM *x = le_pagina(indices, T); //Lê a página no indice T
-
-  int i = x->nchaves - 1;
-  printf("teste\n");
-  if (x->folha){
-    printf("nó folha\n");
-    while ((i >= 0)&&(mat < x->chave[i])){
-      x->chave[i+1] = x->chave[i];
-      x->ind[i+1] = x->ind[i];
+  if (pag->folha){
+    printf("nchaves antes: %d\n", pag->nchaves);
+    while ((i >= 0)&&(mat < pag->chave[i])){
+      pag->chave[i+1] = pag->chave[i];
+      pag->ind[i+1] = pag->ind[i];
       i--;
     }
-    x->chave[i+1] = mat;
-    x->nchaves++;
-    //return x;
-    salva_pagina(indices, T, x);
+    pag->chave[i+1] = mat;
+    pag->ind[i+1] = indPizza;
+    pag->nchaves++;
+    pag->chave[0] = 123;
+    printf("nchaves: %d\n", pag->nchaves);
+    printf("endereço: %ld\n", indAtual);
+    salva_pagina(indices, indAtual, pag); //AO SOBREESCREVER AQUI, NÃO ESTÁ MUDANDO O nchaves
+    printf("é folha\n");
     return;
   }
-  while ((i>=0)&&(mat<x->chave[i]))
-    i--;
-  i++;
+  while ((i>=0)&&(mat < pag->chave[i])) i--;
 
-  long endfilho = x->filho[i];
-  TABM *filhoI = le_pagina(indices, endfilho);
+  i++;
+  TABM *filhoI = le_pagina(indices, pag->filho[i]);
   if (filhoI->nchaves == (2*t-1)){
     printf("nó cheio. irá se dividir\n");
-    divisao(indices, T, i, endfilho);
-    if (mat > x->chave[i])
-      i++;
+    divisao(indices, indAtual, (i+1), pag->filho[i]);
+    if (mat > pag->chave[i])  i++;
   }
-  insere_nao_completo(indices, endfilho, filhoI->chave[i]);
+  printf("Nó não cheio\n");
+  insere_nao_completo(indices, pag->filho[i], filhoI->chave[i], indPizza);
   
 }
 
 
-void insere(long T, int cod, FILE *catalogo, FILE *indices){
+long insere(long indRaiz, int cod, FILE *catalogo, FILE *indices, long indPizza){
   
+  printf("INSERE:\n");
   //if(busca_pizza(indices, catalogo, cod)) return;
-  TABM *x = le_pagina(indices, 0L);
+  TABM *pag = le_pagina(indices, indRaiz);
 
   //passou aqui
-  if(!x){
+  if(!pag){
     printf("nó vazio\n");
-    x=cria(t);
-    x->chave[0] = cod;
-    x->nchaves = 1;
-    fseek(indices, 0L, SEEK_END);
-    salva_pagina(indices, ftell(indices), x);
-    return;
+    pag = cria(t);
+    pag->chave[0] = cod;
+    pag->nchaves = 1;
+    //fseek(indices, 0L, SEEK_END); Tirei essa linha, pois quero que sobreescreva o que já estiver no arquivo
+    salva_pagina(indices, indRaiz, pag);
+
+    printf("nchaves: %d\n", pag->nchaves);
+    return indRaiz;
   }
-  else if(x->nchaves == (2*t)-1){
-    printf("nó cheio");
+  printf("nchaves: %d\n", pag->nchaves);
+  if(pag->nchaves == (2*t)-1){  
+    //Caso a raiz esteja cheia, cria um novo nó e divide a raiz.
+    printf("nó cheioooooooooooooooooooooo\n");
     TABM *S = cria(t);
-    S->nchaves=0;
+    S->nchaves = 0;
     S->folha = 0;
-    S->filho[0] = T;
+    S->filho[0] = indRaiz;
+
+    long indS = ftell(indices);     //Peguei o índice do S
+    fseek(indices, 0L, SEEK_END);   //Botei o cursor no final do arquivo
+    salva_pagina(indices, indS, S); //Escrevi S no arquivo para fazer a divisão
+
+    divisao(indices, indS, 1, 0L);  //Divide a raiz(0L) em S.
     fseek(indices, 0L, SEEK_END);
-    divisao(indices, ftell(indices),1 , T);
-    fseek(indices, 0L, SEEK_END);
-    insere_nao_completo(indices, ftell(indices), cod);
-    return;
+    insere_nao_completo(indices, indS, cod, indPizza);
+
+    return indS;  //S será a nova raiz
   }
-  insere_nao_completo(indices, T, cod);
-  return;
+  printf("Raiz não cheia\n");
+  insere_nao_completo(indices, indRaiz, cod, indPizza);
+  return  indRaiz;  //Não mudou o "ponteiro" para a raiz
 }
 
 
@@ -259,57 +258,35 @@ int main(void){
   int num = 0;
   FILE *dados = fopen("dados_iniciais.dat", "rb+");
   FILE *indices = fopen("indices.bin", "a+b");
-  TABM *T = cria();
+  long indRaiz = 0L;
+  TABM *T;
   while(num != -1){
-    printf("Digite um numero para adicionar. 0 para imprimir e -1 para sair\n");
+    printf("Digite 0 para inserir a próxima pizza, e 1 para imprimir\n");
     scanf("%d", &num);
-    /* if(num == -1){
-      printf("\n");
-      imprime(arvore,0);
-      //libera(arvore);
-      return 0;
-    }
-    */
-    /*
-    else if(num == -9){
-      scanf("%d", &from);
-      arvore = retira(arvore, from, t);
-      Imprime(arvore,0);
-    }
-    */
-    if(!num){
-      printf("\n");
-      TABM *x = le_pagina(indices, 0L);
-      imprime(x, 0, indices);
-    }
-    else if (num==1){
 
-      int n;
-      scanf("%d", &n);
-      if(n == 0){
+
+    if(num == 0){
+
+      long indPizza = ftell(dados);
         TPizza *p = le_pizza(dados);
         printf("NOME DA PIZZA: %s\n", p->nome);
         printf("PREÇO DA PIZZA: %f\n", p->preco);
         printf("DESCRIÇÃO DA PIZZA: %s\n", p->descricao);
         printf("CÓDIGO DA PIZZA: %d\n", p->cod);
-        fseek(indices, 0L, SEEK_SET);
-        insere(/* o que botar aqui? */, p->cod, dados, indices);
-      }
-      
-      if(n == 1){
+        fseek(indices, indRaiz, SEEK_SET);
+        printf("Raiz atual: %ld\n", indRaiz);
+        indRaiz = insere(indRaiz, p->cod, dados, indices, indPizza);
 
-        TABM * no = le_pagina(indices, 0L);
-
-        
-          printf("%d %d\n", no->nchaves, no->folha);
-          printf("%d\n", no->chave[0]);
-          printf("%ld\n", no->prox);
-
-
-
-      }
 
     }
+
+    else if (num == 1){
+
+      TABM *no = le_pagina(indices, indRaiz);
+      imprime(no, 0, indices);
+
+    }
+
     printf("\n\n");
   }
 }
