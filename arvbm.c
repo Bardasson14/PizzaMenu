@@ -178,6 +178,8 @@ void insere_nao_completo(FILE *indices, long indAtual, int mat, long indPizza){
   TABM *pag = le_pagina(indices, indAtual); //Lê a página no indice atual
   int i = pag->nchaves - 1;
 
+  //Se a página atual for folha, já estamos na página certa para inserir
+  //Então é só achar a posição correta e inserir a chave primária e a Pizza 
   if (pag->folha){
     printf("nchaves antes: %d\n", pag->nchaves);
     while ((i >= 0)&&(mat < pag->chave[i])){
@@ -195,17 +197,22 @@ void insere_nao_completo(FILE *indices, long indAtual, int mat, long indPizza){
     printf("é folha\n");
     return;
   }
+  
+  //Caso não seja folha, procura qual filho tem que chamar recursivamente
   while ((i>=0)&&(mat < pag->chave[i])) i--;
 
   i++;
   TABM *filhoI = le_pagina(indices, pag->filho[i]);
+  //Se o filho estiver cheio, divide
   if (filhoI->nchaves == (2*t-1)){
     printf("nó cheio. irá se dividir\n");
-    divisao(indices, indAtual, (i+1), pag->filho[i]);
+    divisao(indices, indAtual, (i+1), pag->filho[i]); //Divide o filho em 2 páginas e sobe a informação intermediária
     if (mat > pag->chave[i])  i++;
   }
+
   printf("Nó não cheio\n");
-  insere_nao_completo(indices, pag->filho[i], filhoI->chave[i], indPizza);
+  //Chama recursivamente para o filho[i]
+  insere_nao_completo(indices, pag->filho[i], mat, indPizza);
   
 }
 
@@ -216,7 +223,7 @@ long insere(long indRaiz, int cod, FILE *catalogo, FILE *indices, long indPizza)
   //if(busca_pizza(indices, catalogo, cod)) return;
   TABM *pag = le_pagina(indices, indRaiz);
 
-  //passou aqui
+  //Se a raiz não existir, nada foi escrito no arquivo ainda, então cria uma primeira página
   if(!pag){
     printf("nó vazio\n");
     pag = cria(t);
@@ -229,6 +236,8 @@ long insere(long indRaiz, int cod, FILE *catalogo, FILE *indices, long indPizza)
     return indRaiz;
   }
   printf("nchaves: %d\n", pag->nchaves);
+
+  //Se a raiz estiver cheia, divide
   if(pag->nchaves == (2*t)-1){  
     //Caso a raiz esteja cheia, cria um novo nó e divide a raiz.
     printf("nó cheioooooooooooooooooooooo\n");
@@ -237,13 +246,14 @@ long insere(long indRaiz, int cod, FILE *catalogo, FILE *indices, long indPizza)
     S->folha = 0;
     S->filho[0] = indRaiz;
 
-    long indS = ftell(indices);     //Peguei o índice do S
+    
     fseek(indices, 0L, SEEK_END);   //Botei o cursor no final do arquivo
+    long indS = ftell(indices);     //Salvei o índice que S será escrito
     salva_pagina(indices, indS, S); //Escrevi S no arquivo para fazer a divisão
 
-    divisao(indices, indS, 1, 0L);  //Divide a raiz(0L) em S.
-    fseek(indices, 0L, SEEK_END);
-    insere_nao_completo(indices, indS, cod, indPizza);
+    divisao(indices, indS, 1, indRaiz);  //Divide a raiz(indRaiz) em S.
+    insere_nao_completo(indices, indS, cod, indPizza);  //Vai inserir recursivamente a partir de S
+
 
     return indS;  //S será a nova raiz
   }
