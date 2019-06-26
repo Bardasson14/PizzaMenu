@@ -2,7 +2,8 @@
     "files.associations": {
         "arvbm.h": "c",
         "stdio.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "pizza.h": "c"
     },
     "C_Cpp.errorSquiggles": "Enabled"
 }

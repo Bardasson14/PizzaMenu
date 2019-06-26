@@ -16,7 +16,7 @@ TABM *cria();    //Cria árvore em MP
 
 //void libera(TABM *a); //libera árvore na MP
 
-void imprime(TABM *a, int andar, FILE *indices); //Imprime árvore do arquivo
+void imprime(long indAtual, int andar, FILE *indices); //Imprime árvore do arquivo
 
 /*  
   A função divisão divide uma página cheia e leva o valor intermediario para o pai

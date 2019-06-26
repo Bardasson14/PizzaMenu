@@ -2,7 +2,7 @@
 
 void imprime_pizza(TPizza *p)
 {
-	printf("%d, %s (%s), R$ %.2f\n", p->cod, p->nome, p->descricao, p->preco);
+	printf("CÓDIGO: %d \nNOME:%s (%s) \nPREÇO: R$ %.2f \n\n", p->cod, p->nome, p->descricao, p->preco);
 }
 
 
