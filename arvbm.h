@@ -63,7 +63,7 @@ void remove_pizza(); //Remove(a melhor opção é mudar os indices para nunca pa
 
 void remove_categoria(); //Remove todas as pizzas de uma mesma categoria
 
-TPizza *busca_pizza(FILE *indices, FILE* catalogo, int cod);  //Busca a pizza pela chave primária
+TPizza *busca_pizza(FILE *indices, FILE* catalogo, int cod, long indAtual);  //Busca a pizza pela chave primária
 
 TPizza **busca_categoria(FILE *indices, FILE* catalogo, char * categoria); //Busca todas as pizzas de uma categoria
 
