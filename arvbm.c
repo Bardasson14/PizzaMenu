@@ -18,7 +18,7 @@ TABM *le_pagina(FILE *indices, long indice){
   size_t ok = fread(pagina, sizeof(TABM), 1, indices);
   
   if(ok != 1){
-    printf("Não tem árvore no arquivo\n");
+    //printf("Não tem árvore no arquivo\n");
     return NULL;
   }
 
@@ -71,7 +71,7 @@ TABM *inicializa(void){
 
 TPizza *busca_pizza(FILE *indices, FILE* dados, int cod, long indAtual){
 
-  printf("entrou na busca;\n");
+  //printf("entrou na busca;\n");
   if(!indices || !dados) return NULL;
 
   //Pegando a pagina no arquivo
@@ -83,13 +83,13 @@ TPizza *busca_pizza(FILE *indices, FILE* dados, int cod, long indAtual){
   if((i < pagina->nchaves) && (pagina->folha) && (cod == pagina->chave[i])){
 
     long dadosAtual = ftell(dados);
-    printf("chave[i] = %d", pagina->chave[i]);
+    //printf("chave[i] = %d", pagina->chave[i]);
     
     fseek(dados, pagina->ind[i], SEEK_SET);  //Bota o cursor na posição da pizza no arquivo de dados
     TPizza *pizza = le_pizza(dados);
 
     fseek(dados, dadosAtual, SEEK_SET);
-    printf("cod pizza -> %d", pizza->cod);
+    //printf("cod pizza -> %d", pizza->cod);
     return pizza;
 
   }
@@ -101,8 +101,37 @@ TPizza *busca_pizza(FILE *indices, FILE* dados, int cod, long indAtual){
   if(pagina->filho[i] != -1)  
     pizza = busca_pizza(indices, dados, cod, pagina->filho[i]); 
   
-  printf("saiu da busca\n");
+  //printf("saiu da busca\n");
   return pizza;
+
+}
+
+long busca_end_pizza(FILE *indices, FILE* dados, int cod, long indAtual){
+
+  //printf("entrou na busca;\n");
+  if(!indices || !dados) return -1;
+
+  //Pegando a pagina no arquivo
+  TABM *pagina = le_pagina(indices, indAtual);
+  if(!pagina) return -1;
+
+  int i = 0;
+  while((i < pagina->nchaves) && (cod > pagina->chave[i])) i++;
+  if((i < pagina->nchaves) && (pagina->folha) && (cod == pagina->chave[i])){
+
+    return pagina->ind[i];
+
+  }
+
+  if(pagina->folha) return -1;
+  if(pagina->chave[i] == cod) i++;
+  
+  TPizza *pizza = NULL;
+  if(pagina->filho[i] != -1)  
+    return busca_end_pizza(indices, dados, cod, pagina->filho[i]); 
+  
+  //printf("saiu da busca\n");
+  return pagina->ind[i];
 
 }
 
@@ -189,7 +218,7 @@ void divisao(FILE *indices, long pai, int i, long filho){
 
 void insere_nao_completo(FILE *indices, long indAtual, int mat, long indPizza){
 
-  printf("VEIO INSERIR:\n");
+  //printf("VEIO INSERIR:\n");
 
   TABM *pag = le_pagina(indices, indAtual); //Lê a página no indice atual
   int i = pag->nchaves - 1;
@@ -240,7 +269,7 @@ long insere(long indRaiz, int cod, FILE *dados, FILE *indices, long indPizza){
   //Se a raiz não existir, nada foi escrito no arquivo ainda, então cria uma primeira página
   if(!pag){
 
-    printf("Cria página\n");
+    //printf("Cria página\n");
     pag = cria(t);
     pag->chave[0] = cod;
     pag->ind[0] = indPizza;
@@ -272,6 +301,39 @@ long insere(long indRaiz, int cod, FILE *dados, FILE *indices, long indPizza){
   return  indRaiz;  //Não mudou o "ponteiro" para a raiz
 }
 
+void altera_dados(int cod, FILE *indices, FILE *catalogo, long indice){
+  long endP = busca_end_pizza(indices, catalogo, cod, indice);
+  
+  if (endP == -1){
+    printf("A pizza não foi encontrada\n");
+    return;
+  }
+
+  printf("INSIRA AS NOVAS INFORMAÇÕES: \n");
+  char nome[50], descricao[20];
+  float preco;
+
+  printf("NOME DA PIZZA: ");
+  scanf("%s", nome);
+
+  printf("CATEGORIA DA PIZZA: \n");
+  scanf("%s", descricao);
+
+  printf("PREÇO DA PIZZA: R$ ");
+  scanf("%f", &preco);
+
+  long indAtual = ftell(catalogo);
+  fseek(catalogo, endP, SEEK_SET);
+  //imprime_pizza(le_pizza(catalogo));
+
+  TPizza *p = le_pizza(catalogo);
+  strcpy(p->nome, nome);
+  strcpy(p->descricao, descricao);
+  p->preco = preco;
+  imprime_pizza(p);
+  salva_pizza(p, catalogo);
+  fseek(catalogo, indAtual, SEEK_SET);
+}
 
 int main(void){
   TABM * arvore = inicializa();
@@ -289,12 +351,13 @@ int main(void){
   printf("indRaiz: %ld", indRaiz);
 
   TABM *T;
-  while(num != -1){
+  while(num!=-1){
 
     printf("Comandos:\n");
     printf(" 0 - insere próxima pizza\n");
     printf(" 1 - imprime árvore \n");
     printf(" 2 - busca pizza pelo código \n");
+    printf(" 3 - altera pizza\n");
     printf("-1 - sair\n");
     
     scanf("%d", &num);
@@ -329,6 +392,14 @@ int main(void){
       else  imprime_pizza(pizza);
 
     }
+
+    else if (num == 3){
+      int cod;
+      printf("entre com o codigo \n");
+      scanf("%d", &cod);
+      altera_dados(cod, indices, dados, indRaiz);
+    }
+
 
     // TPizza* h = le_pizza(dados);
     // imprime_pizza(h);
