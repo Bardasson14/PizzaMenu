@@ -135,6 +135,7 @@ long busca_end_pizza(FILE *indices, FILE* dados, int cod, long indAtual){
 
 }
 
+ 
 void imprime(long indAtual, int andar, FILE *indices){
 
   TABM *a = le_pagina(indices, indAtual);
@@ -147,6 +148,10 @@ void imprime(long indAtual, int andar, FILE *indices){
     }
     if(a->filho[i] != -1) imprime(a->filho[i],andar+1, indices);
   }
+}
+
+void busca_categoria(FILE *indices, FILE* catalogo, char * categoria){
+  
 }
 
 void divisao(FILE *indices, long pai, int i, long filho){
