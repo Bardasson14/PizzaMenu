@@ -63,8 +63,12 @@ void remove_pizza(); //Remove(a melhor opção é mudar os indices para nunca pa
 
 void remove_categoria(); //Remove todas as pizzas de uma mesma categoria
 
-TPizza *busca_pizza(FILE *indices, FILE* catalogo, int cod);  //Busca a pizza pela chave primária
+TPizza *busca_pizza(FILE *indices, FILE* catalogo, int cod, long indAtual);  //Busca a pizza pela chave primária
 
-TPizza **busca_categoria(FILE *indices, FILE* catalogo, char * categoria); //Busca todas as pizzas de uma categoria
+void busca_categoria(FILE *indices, FILE* catalogo, char * categoria, long indRaiz);  //Pede inputs para alterar as informações de uma pizza de chave primária cod;
 
-void altera_Pizza(FILE *indices, FILE* catalogo, int cod);  //Pede inputs para alterar as informações de uma pizza de chave primária cod;
+void imprime_linear(FILE *indices, FILE *catalogo, long indAtual);
+
+void altera_dados(int cod, FILE *indices, FILE *catalogo, long indRaiz);
+
+long busca_end_pizza(FILE *indices, FILE* dados, int cod, long indAtual);
