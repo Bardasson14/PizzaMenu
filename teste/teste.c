@@ -74,7 +74,10 @@ TABM *divisao(TABM *x, int i, TABM* y, int t){
   else {
     z->nchaves = t; //z possuir� uma chave a mais que y se for folha
     for(j=0;j < t;j++) z->chave[j] = y->chave[j+t-1];//Caso em que y � folha, temos q passar a info para o n� da direita
+    
+    z->prox = y->prox;
     y->prox = z;
+    
   }
   y->nchaves = t-1;
   for(j=x->nchaves; j>=i; j--) x->filho[j+1]=x->filho[j];
@@ -128,6 +131,24 @@ TABM *insere(TABM *T, int mat, int t){
   return T;
 }
 
+void imprime_linear(TABM *a){
+
+  if(!a) return;
+
+  while(!a->folha)  a = a->filho[0];
+
+  for (int i = 0; i < a->nchaves;i++){
+
+    printf("Código: %d\n", a->chave[i]);
+
+
+  }
+
+  imprime_linear(a->prox);
+
+
+}
+
 
 int main(void){
   TABM * arvore = inicializa();
@@ -152,6 +173,9 @@ int main(void){
       printf("\n");
       imprime(arvore,0);
     }
+
+    else if(num == -5)  imprime_linear(arvore);
+
     else arvore = insere(arvore, num, t);
     printf("\n\n");
   }
