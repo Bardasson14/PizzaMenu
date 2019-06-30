@@ -68,3 +68,7 @@ TPizza *busca_pizza(FILE *indices, FILE* catalogo, int cod, long indAtual);  //B
 void busca_categoria(FILE *indices, FILE* catalogo, char * categoria, long indRaiz);  //Pede inputs para alterar as informações de uma pizza de chave primária cod;
 
 void imprime_linear(FILE *indices, FILE *catalogo, long indAtual);
+
+void altera_dados(int cod, FILE *indices, FILE *catalogo, long indRaiz);
+
+long busca_end_pizza(FILE *indices, FILE* dados, int cod, long indAtual);
