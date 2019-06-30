@@ -481,15 +481,15 @@ int main(void){
 
     }
 
-    else if(num == 5){
+    // else if(num == 5){
 
-      TABM *a = le_pagina(indices, indRaiz);
-      printf("indfilho: %ld\n", a->filho[0]);
+    //   TABM *a = le_pagina(indices, indRaiz);
+    //   printf("indfilho: %ld\n", a->filho[0]);
 
-      TABM *b = le_pagina(indices, a->filho[0]);
-      printf("indfilhodofilho: %ld\n", b->filho[0]);
+    //   TABM *b = le_pagina(indices, a->filho[0]);
+    //   printf("indfilhodofilho: %ld\n", b->filho[0]);
 
-    }
+    // }
 
     else if(num == 10){
 
