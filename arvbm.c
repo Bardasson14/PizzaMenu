@@ -520,7 +520,7 @@ int main(void){
       indices = fopen("indices.bin", "w+b");
       fclose(indices);
       indices = fopen("indices.bin", "r+b");
-
+      fseek(dados, 0L, SEEK_SET);
     }
 
     // TPizza* h = le_pizza(dados);
