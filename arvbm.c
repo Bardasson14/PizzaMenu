@@ -18,7 +18,7 @@ TABM *le_pagina(FILE *indices, long indice){
   size_t ok = fread(pagina, sizeof(TABM), 1, indices);
   
   if(ok != 1){
-    printf("Não tem árvore no arquivo\n");
+    //printf("Não tem árvore no arquivo\n");
     return NULL;
   }
 
@@ -264,7 +264,7 @@ void divisao(FILE *indices, long pai, int i, long filho){
 
 void insere_nao_completo(FILE *indices, long indAtual, int mat, long indPizza){
 
-  printf("VEIO INSERIR:\n");
+  //printf("VEIO INSERIR:\n");
 
   TABM *pag = le_pagina(indices, indAtual); //Lê a página no indice atual
 
@@ -273,13 +273,13 @@ void insere_nao_completo(FILE *indices, long indAtual, int mat, long indPizza){
   //Se a página atual for folha, já estamos na página certa para inserir
   //Então é só achar a posição correta e inserir a chave primária e a Pizza 
   if (pag->folha){
-    printf("É FOLHA\n");
+    //printf("É FOLHA\n");
     while ((i >= 0)&&(mat < pag->chave[i])){
       pag->chave[i+1] = pag->chave[i];
       pag->ind[i+1] = pag->ind[i];
       i--;
     }
-    printf("SAIU DO WHILE\n");
+    //printf("SAIU DO WHILE\n");
     pag->chave[i+1] = mat;
     pag->ind[i+1] = indPizza;
     pag->nchaves++;
@@ -290,9 +290,9 @@ void insere_nao_completo(FILE *indices, long indAtual, int mat, long indPizza){
   //Caso não seja folha, procura qual filho tem que chamar recursivamente
   while ((i>=0)&&(mat < pag->chave[i])) i--;
   i++;
-  printf("entrou \n");
+  //printf("entrou \n");
   TABM *filhoI = le_pagina(indices, pag->filho[i]);
-  printf("saiu\n");
+  //printf("saiu\n");
   //Se o filho estiver cheio, divide
   if (filhoI->nchaves == (2*t-1)){
     divisao(indices, indAtual, (i+1), pag->filho[i]); //Divide o filho em 2 páginas e sobe a informação intermediária
@@ -310,7 +310,7 @@ long insere(long indRaiz, int cod, FILE *dados, FILE *indices, long indPizza){
   
   if(busca_pizza(indices, dados, cod, indRaiz)){
 
-  printf("Já existe uma pizza de mesmo código no arquivo.\n");
+  //printf("Já existe uma pizza de mesmo código no arquivo.\n");
   return indRaiz;
   
   }
@@ -404,7 +404,9 @@ int main(void){
   int num = 0;
   FILE *dados = fopen("dados_iniciais.dat", "rb+");
   FILE *indices = fopen("indices.bin", "r+b");
-
+  printf("---------------------------------------\n");
+  printf("              CATÁLOGO                 \n");
+  printf("---------------------------------------\n");
 
   //Para manter a posição da raiz mesmo depois de fechar o arquivo, reservei o indice 0L para guardar esta informação
   //Desta maneira toda vez que iniciar o programa, lê o 0L para checar se já tem um indice de raiz guardado 
@@ -412,22 +414,25 @@ int main(void){
   rewind(indices);  //Just in case
   size_t ok = fread(&indRaiz, sizeof(long), 1, indices);  //Lê a posição 0L em busca de um indice
   if(!ok)  indRaiz = 10L; //Se não tem nada 
-  printf("indRaiz: %ld", indRaiz);
+  //printf("indRaiz: %ld", indRaiz);
 
   TABM *T;
   while(num!=-1){
 
-    printf("indRaiz: %ld\n", indRaiz);
+    //printf("[ENDEREÇO DA RAIZ NO ARQUIVO: %ld]\n", indRaiz);
 
-    printf("Comandos:\n");
-    printf(" 0 - insere próxima pizza\n");
-    printf(" 1 - imprime árvore \n");
-    printf(" 2 - busca pizza pelo código \n");
-    printf(" 3 - altera pizza\n");
-    printf(" 4 - busca todas as pizzas de uma categoria \n");
-    printf("10 - insere todas as pizzas restantes do catálogo \n");
-    printf("-1 - sair\n");
-    printf("-9 - limpa árvore\n");
+    printf("\n\n--------------------------------------------------\n");
+    printf("MENU:\n");
+    printf(" 0 - INSERE PRÓXIMA PIZZA\n");
+    printf(" 1 - IMPRIME ÁRVORE\n");
+    printf(" 2 - BUSCA PIZZA PELO CÓDIGO\n");
+    printf(" 3 - ALTERA INFORMAÇÃO SUBORDINADA DE UMA PIZZA\n");
+    printf(" 4 - BUSCA TODAS AS PIZZAS DE UMA CATEGORIA\n");
+    printf(" 5 - INSERE TODAS AS PIZZAS RESTANTES\n");
+    printf("-1 - SAI DO PROGRAMA\n");
+    printf("-9 - LIMPA A ÁRVORE\n");
+    printf("---------------------------------------\n");
+
     
     scanf("%d", &num);
 
@@ -442,7 +447,7 @@ int main(void){
 
         indRaiz = insere(indRaiz, p->cod, dados, indices, indPizza);
       }
-      else printf("!!!! ACABOU O ARQUIVO DE DADOS !!!!\n");
+      else printf("------FIM DO ARQUIVO DE ENTRADA------!\n");
     }
 
     else if (num == 1){
@@ -491,7 +496,7 @@ int main(void){
 
     // }
 
-    else if(num == 10){
+    else if(num == 5){
 
       int tudo_certo = 1;
       while(tudo_certo){
