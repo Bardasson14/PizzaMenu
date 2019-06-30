@@ -361,6 +361,13 @@ void altera_dados(int cod, FILE *indices, FILE *catalogo, long indRaiz){
     return;
   }
 
+  long indAtual = ftell(catalogo);  //Guarda o índice da atual do catálogo
+
+  fseek(catalogo, endP, SEEK_SET);  //Bota o cursor na posição da pizza 
+  TPizza *p = le_pizza(catalogo);   //Lê a pizza
+  printf("\nPizza antes das alterações: \n");
+  imprime_pizza(p);
+
   printf("INSIRA AS NOVAS INFORMAÇÕES: \n");
   char nome[50], descricao[20];
   float preco;
@@ -368,24 +375,27 @@ void altera_dados(int cod, FILE *indices, FILE *catalogo, long indRaiz){
   printf("NOME DA PIZZA: ");
   scanf("%s", nome);
 
-  printf("CATEGORIA DA PIZZA: \n");
+  printf("CATEGORIA DA PIZZA: ");
   scanf("%s", descricao);
 
   printf("PREÇO DA PIZZA: R$ ");
   scanf("%f", &preco);
 
-  long indAtual = ftell(catalogo);  //Guarda o índice da atual do catálogo
+  // long indAtual = ftell(catalogo);  //Guarda o índice da atual do catálogo
 
-  fseek(catalogo, endP, SEEK_SET);  //Bota o cursor na posição da pizza 
-  TPizza *p = le_pizza(catalogo);   //Lê a pizza
+  // fseek(catalogo, endP, SEEK_SET);  //Bota o cursor na posição da pizza 
+  // TPizza *p = le_pizza(catalogo);   //Lê a pizza
   strcpy(p->nome, nome);
   strcpy(p->descricao, descricao);
   p->preco = preco;
 
+  printf("\nPizza depois das alterações: \n");
   imprime_pizza(p);
 
   fseek(catalogo, endP, SEEK_SET);  //Bota o cursor na posição da pizza
   salva_pizza(p, catalogo);         //Sobreescreve a pizza
+
+  fseek(catalogo, indAtual, SEEK_SET);  //Volta para o índice do catálogo
   
 }
 
@@ -414,7 +424,10 @@ int main(void){
     printf(" 1 - imprime árvore \n");
     printf(" 2 - busca pizza pelo código \n");
     printf(" 3 - altera pizza\n");
+    printf(" 4 - busca todas as pizzas de uma categoria \n");
+    printf("10 - insere todas as pizzas restantes do catálogo \n");
     printf("-1 - sair\n");
+    printf("-9 - limpa árvore\n");
     
     scanf("%d", &num);
 
@@ -423,11 +436,13 @@ int main(void){
 
       long indPizza = ftell(dados);
       TPizza *p = le_pizza(dados);
-      imprime_pizza(p);
 
-      indRaiz = insere(indRaiz, p->cod, dados, indices, indPizza);
+      if(p){
+        imprime_pizza(p);
 
-
+        indRaiz = insere(indRaiz, p->cod, dados, indices, indPizza);
+      }
+      else printf("!!!! ACABOU O ARQUIVO DE DADOS !!!!\n");
     }
 
     else if (num == 1){
@@ -476,6 +491,33 @@ int main(void){
 
     }
 
+    else if(num == 10){
+
+      int tudo_certo = 1;
+      while(tudo_certo){
+
+        long indPizza = ftell(dados);
+        TPizza *p = le_pizza(dados);
+
+        if(p){
+          indRaiz = insere(indRaiz, p->cod, dados, indices, indPizza);
+        }
+        else{
+          printf("!!!! ACABOU O ARQUVO DE DADOS !!!!\n");
+          tudo_certo = 0;
+        }      
+      }
+    }
+
+    else if(num == -9){
+
+      fclose(indices);
+      indices = fopen("indices.bin", "w+b");
+      fclose(indices);
+      indices = fopen("indices.bin", "r+b");
+
+    }
+
     // TPizza* h = le_pizza(dados);
     // imprime_pizza(h);
 
@@ -500,7 +542,10 @@ int main(void){
     printf("\n\n");
   }
 
-    rewind(indices);
-    fwrite(&indRaiz, sizeof(long), 1, indices);
+  rewind(indices);
+  fwrite(&indRaiz, sizeof(long), 1, indices);
+
+  fclose(indices);
+  fclose(dados);
 
 }
